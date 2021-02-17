@@ -7,7 +7,7 @@ const torrents = {}
 const rarbg = new RARBG('DST');
 app.use(require('body-parser').json())
 app.set('view engine', 'ejs')
-require('dotenv').config()
+if (process.env.NODE_ENV != 'production') require('dotenv').config()
 
 
 app.get('/', (req, res) => {

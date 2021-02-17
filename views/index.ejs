@@ -16,7 +16,7 @@
         </div>
     </div>
     <div class="text" x-show.transition="page == 1">
-        <span>I want to download the</span>
+        <span class="mobile-block">I want to download the</span>
         <select name="type" id="type" x-model="type">
             <option value="tv">TV Episode</option>
             <option value="movie">Movie</option>
@@ -75,7 +75,7 @@
             loading: true,
             torrents: [],
             async search() {
-                const {data: torrents} = await axios.post('/torrents', {
+                const {data: torrents} = await axios.post('./torrents', {
                     name: this.name,
                     season: Number(this.season),
                     episode: Number(this.episode),
@@ -92,7 +92,7 @@
             async download(name) {
                 try {
                     this.page += 1;
-                    await axios.post('/download', {
+                    await axios.post('./download', {
                         name
                     })
                     this.status = ['✅', 'Downloading', 'The media will be available soon!'];
@@ -248,6 +248,25 @@
         width: 100vw;
         display: flex;
         align-items: center;
+    }
+
+    @media screen and (max-width: 900px) {
+        .text, select, input {
+            font-size: 1rem;
+        }
+
+        input {
+            width: 20vw;
+        }
+
+        .mobile-block {
+            display: block;
+        }
+
+        .entry, .entry>p {
+            max-width: 70vw;
+            word-wrap: break-word;
+        }
     }
     
 </style>
