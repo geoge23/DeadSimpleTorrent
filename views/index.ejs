@@ -10,6 +10,11 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic" rel="stylesheet" />
 </head>
 <body x-data="main()">
+    <div class="center">
+        <div class="banner" :class="{'active-banner': banner, 'banner': true}">
+            <p x-text="banner"></p>
+        </div>
+    </div>
     <div class="text" x-show.transition="page == 1">
         <span>I want to download the</span>
         <select name="type" id="type" x-model="type">
@@ -38,6 +43,22 @@
     </div>
     <div x-show.transition="page == 2">
         <div x-show="torrents.length < 1" class="lds-dual-ring"></div>
+        <template x-for="entry in torrents">
+            <div class="entry">
+                <p x-text="entry.filename"></p>
+                <p><span x-text="entry.category"></span> | <span @click="download(entry.filename)" class="download">Download</span></p>
+                <hr>
+            </div>
+        </template>
+    </div>
+    <div x-show.transition="page == 3">
+        <div x-show="loading" class="lds-dual-ring"></div>
+        <div x-show="!loading">
+            <p class="emoji align-center" x-text="status[0]"></p>
+            <h1 class="align-center" x-text="status[1]"></h1>
+            <p x-text="status[2]"></p>
+            <a href="/">Go again</a>
+        </div>
     </div>
 </body>
 <script>
@@ -47,21 +68,65 @@
             name: null,
             season: null,
             episode: null,
-            res: null,
+            res: '720',
             page: 1,
+            banner: '',
+            status: [],
+            loading: true,
             torrents: [],
-            search() {
-                axios.post('/torrents', {
+            async search() {
+                const {data: torrents} = await axios.post('/torrents', {
                     name: this.name,
                     season: Number(this.season),
                     episode: Number(this.episode),
-                    res: this.res
+                    res: this.res,
+                    category: this.type
                 })
+                console.log(torrents)
+                if (torrents instanceof Array) {
+                    this.torrents = torrents;
+                    this.page += 1;
+                } else {
+                    this.setBanner('No torrents found', 3000)
+                }
+            },
+            async download(name) {
+                try {
+                    this.page += 1;
+                    await axios.post('/download', {
+                        name
+                    })
+                    this.status = ['✅', 'Downloading', 'The media will be available soon!'];
+                    this.loading = false;
+                } catch (e) {
+                    this.status = ['❌', 'Failed', 'Please try again later'];
+                    this.loading = false;
+                }
+
+            },
+            setBanner(text, time) {
+                this.banner = text
+                setTimeout(() => {
+                    this.banner = ''
+                }, time)
             }
         }
     }
 </script>
 <style>
+    :root {
+        font-family: 'Montserrat';
+    }
+
+    a {
+        color: white;
+        text-align: center;
+    }
+
+    h1 {
+        margin: 0;
+    }
+
     body {
         height: 100vh;
         width: 100vw;
@@ -73,6 +138,24 @@
         box-sizing: border-box;
         background-color: #495867;
         color: white;
+    }
+
+    .emoji {
+        font-size: 10vh;
+    }
+
+    .download {
+        color: green;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    .entry>p {
+        font-family: 'Montserrat';
+    }
+
+    .entry>p:first-of-type {
+        font-weight: 600;
     }
 
     .text, select, input {
@@ -110,6 +193,10 @@
         border-bottom: 1px dashed black;
     }
 
+    .align-center {
+        text-align: center;
+    }
+
     option {
         color: black;
     }
@@ -138,5 +225,31 @@
             transform: rotate(360deg);
         }
     }
+
+    .banner {
+        transition: 500ms ease;
+        background-color: rgb(255, 138, 138);
+        border: red 1px solid;
+        font-family: 'Montserrat';
+        transform: translateY(-400px);
+        margin-left: auto;
+        margin-right: auto;
+        width: 40vw;
+        text-align: center;
+    }
+
+    .active-banner {
+        transform: translateY(0);
+    }
+
+    .center {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+    }
+    
 </style>
 </html>
