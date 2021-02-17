@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.0/dist/alpine.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>DeadSimpleTorrent</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic" rel="stylesheet" />
+</head>
+<body x-data="main()">
+    <div class="text" x-show.transition="page == 1">
+        <span>I want to download the</span>
+        <select name="type" id="type" x-model="type">
+            <option value="tv">TV Episode</option>
+            <option value="movie">Movie</option>
+        </select>
+        <br>
+        <input type="text" x-model="name" placeholder="Agents of S.H.I.E.L.D." class="underline" style="width: 100%"></input>
+        <br>
+        <div x-show="type == 'tv'">
+            <span>Season </span>
+            <input x-model="season" type="number" min="1" max="100" placeholder="1"></input>
+            <span>Episode </span>
+            <input x-model="episode" type="number" min="1" max="500" placeholder="5"></input>
+            <br>
+        </div>
+        <span>at </span>
+        <select x-model="res" name="res" id="res">
+            <option value="480">480</option>
+            <option value="720">720</option>
+            <option value="1080">1080</option>
+            <option value="2160">2160</option>
+        </select>
+        <span>p</span>
+        <button @click="search()">Go!</button>
+    </div>
+    <div x-show.transition="page == 2">
+        <div x-show="torrents.length < 1" class="lds-dual-ring"></div>
+    </div>
+</body>
+<script>
+    function main() {
+        return { 
+            type: 'tv', 
+            name: null,
+            season: null,
+            episode: null,
+            res: null,
+            page: 1,
+            torrents: [],
+            search() {
+                axios.post('/torrents', {
+                    name: this.name,
+                    season: Number(this.season),
+                    episode: Number(this.episode),
+                    res: this.res
+                })
+            }
+        }
+    }
+</script>
+<style>
+    body {
+        height: 100vh;
+        width: 100vw;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        box-sizing: border-box;
+        background-color: #495867;
+        color: white;
+    }
+
+    .text, select, input {
+        font-size: 2rem;
+        font-family: 'Montserrat';
+        background-color: transparent;
+        color: white;
+    }
+
+    span {
+        line-height: 2em;
+    }
+
+    button {
+        max-width: 500px;
+        width: 50vw;
+        height: 5vh;
+        font-family: 'Montserrat';
+        font-size: 1.5rem;
+        background-color: #FE5F55;
+        color: white;
+        border: none;
+        margin: 1vh;
+        transition: 250ms ease;
+        display: block;
+    }
+
+    button:hover {
+        box-shadow: rgba(0, 0, 0, 0.24) 5px 5px 50px;
+        cursor: pointer;
+    }
+
+    select, input {
+        border: 0;
+        border-bottom: 1px dashed black;
+    }
+
+    option {
+        color: black;
+    }
+
+    .lds-dual-ring {
+        display: inline-block;
+        width: 80px;
+        height: 80px;
+    }
+    .lds-dual-ring:after {
+        content: " ";
+        display: block;
+        width: 64px;
+        height: 64px;
+        margin: 8px;
+        border-radius: 50%;
+        border: 6px solid #fff;
+        border-color: #fff transparent #fff transparent;
+        animation: lds-dual-ring 1.2s linear infinite;
+    }
+    @keyframes lds-dual-ring {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+</html>
