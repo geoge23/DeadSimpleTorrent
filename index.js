@@ -66,6 +66,7 @@ function generateDownloadDir(name, category) {
         path += '/S'
         path += name[1].split('E')[0]
     } else {
+        category = 'movies'
         path = name
     }
     return `/data/completed/${category}/${path}`;
