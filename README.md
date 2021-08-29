@@ -1,7 +1,7 @@
 # DeadSimpleTorrent
 Connect your Transmission Web UI to a minimalistic, efficient download menu powered by RARBG
 
-![DeadSimpleTorrent Demo](https://geoge.ml/imgs/dst-example.gif)
+![DeadSimpleTorrent Demo](https://geoge.co/data/imgs/dst-example.gif)
 
 ### Configuration
 Setup is, as expected, dead simple. The reccommended way to run this program is with Docker. Just run
